@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import textValidation from '../../validations/text-validation';
 import emailValidation from '../../validations/email-validation';
@@ -21,31 +21,61 @@ export default function CadastrarContatosForm() {
         reset
     } = useForm();
  
-    //função para executar o submit do formulário
-    const onSubmit = (data) => {
+    //função para obter os dados do contato atraves do ID
+    const obterContato = (idContato) => {
  
-        //limpar as mensagens de sucesso e erro
-        setMensagemSucesso('');
-        setMensagemErro('');
- 
-        //fazendo a requisição para a API..
-        contatosService.postContato(data)
+        contatosService.getContatoById(idContato)
             .then(
                 result => {
-                    setMensagemSucesso(result.message);
- 
+                    //preenchendo o formulário com os dados do contato
                     reset({
-                        nome: '', email: '', telefone: ''
+                        idContato: result.idContato,
+                        nome: result.nome,
+                        email: result.email,
+                        telefone: result.telefone
                     })
                 }
             )
             .catch(
                 e => {
-                    console.log(e.response);
-                    setMensagemErro('Não foi possível realizar o cadastro do contato.')
+                    console.log(e);
                 }
             )
     }
+ 
+    //função para executar o submit do formulário
+    const onSubmit = (data) => {
+       //limpar mensagens de sucesso e erro
+       setMensagemErro('')
+       setMensagemSucesso('')
+
+       //realizando a edição do contato
+       contatosService.putContato(data)
+            .then(
+                (result) => {
+                    setMensagemSucesso(result.message);
+                }
+            )
+            .catch(
+                e=>{
+                    console.log(e.response)
+                    setMensagemErro('Não foi possível fazer a edição do contato');
+                }
+            )
+    }
+ 
+    //função do REACT HOOKS executada ao abrir o componente
+    useEffect(
+        () => {
+ 
+            //ler o id enviado pela URL
+            const url = window.location.href;
+            const idContato = url.substring(url.lastIndexOf('?id=') + 4);
+ 
+            //carregar os dados do contato
+            obterContato(idContato);
+        }, []
+    )
  
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -65,6 +95,24 @@ export default function CadastrarContatosForm() {
             }
  
             <div className="row">
+ 
+                {/* campo oculto para o 'idContato' */}
+                <Controller
+                        control={control}
+                        name="idContato"
+                        defaultValue=''
+                        render={
+                            ({ field: { onChange, onBlur, value } }) => (
+                                <input
+                                    type="hidden"
+                                    id="idContato"
+                                    onChange={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                />
+                            )
+                        }
+                    />
  
                 {/* campo 'nome' */}
                 <div className="col-md-6">
@@ -170,8 +218,8 @@ export default function CadastrarContatosForm() {
             <div className="row mt-3">
                 <div className="col-md-12">
  
-                    <input type='submit' value='Realizar Cadastro'
-                        className="btn btn-success" />
+                    <input type='submit' value='Salvar Alterações'
+                        className="btn btn-primary" />
  
                 </div>
             </div>
@@ -179,5 +227,6 @@ export default function CadastrarContatosForm() {
         </form>
     )
 }
+
 
 

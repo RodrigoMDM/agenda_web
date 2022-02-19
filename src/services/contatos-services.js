@@ -11,6 +11,42 @@ export const postContato = (data) => {
         )
 }
  
+export const putContato = (data) => {
+    return axios.put(`${config.getApiUrl()}/Contatos`, data)
+        .then(
+            response => {
+                return response.data;
+            }
+        )
+}
+ 
+export const deleteContato = (idContato) => {
+    return axios.delete(`${config.getApiUrl()}/Contatos/${idContato}`)
+        .then(
+            response => {
+                return response.data;
+            }
+        )
+}
+ 
+export const getContatos = () => {
+    return axios.get(`${config.getApiUrl()}/Contatos`)
+        .then(
+            response => {
+                return response.data;
+            }
+        )
+}
+ 
+export const getContatoById = (idContato) => {
+    return axios.get(`${config.getApiUrl()}/Contatos/${idContato}`)
+        .then(
+            response => {
+                return response.data;
+            }
+        )
+}
+ 
 //Interceptador para fazer o envio do TOKEN
 axios.interceptors.request.use(
     config => {
@@ -31,5 +67,3 @@ axios.interceptors.request.use(
         Promise.reject(error);
     }
 )
-
-

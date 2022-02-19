@@ -27,8 +27,12 @@ export default function LoginForm() {
         services.postLogin(data)
             .then( //retorno de sucesso
                 result => {
+                   
                     //gravar os dados em local storage
                     helper.signIn(result);
+ 
+                    //redirecionar o usuário para a página de consulta de contatos
+                    window.location.href = '/consultar-contatos';
                 }
             )
             .catch( //retorno de erro
@@ -132,6 +136,5 @@ export default function LoginForm() {
         </form>
     )
 }
-
 
 
